@@ -27,6 +27,7 @@ header {background: transparent !important;}
     margin: 0;
     background: linear-gradient(90deg, #ff2e93, #7c4dff, #00e5ff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 700;
 }
