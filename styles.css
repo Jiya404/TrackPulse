@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap');
+
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+.stApp {
+    background: radial-gradient(circle at 10% 0%, #1b1035 0%, #0c0817 45%, #060509 100%);
+    color: #f4f2ff;
+}
+
+/* Hide default streamlit chrome for a cleaner look */
+#MainMenu, footer {visibility: hidden;}
+header {background: transparent !important;}
+
+/* Hero title */
+.tp-hero {
+    padding: 1.4rem 1.8rem;
+    border-radius: 22px;
+    background: linear-gradient(120deg, rgba(255,0,153,0.18), rgba(0,229,255,0.14));
+    border: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 1.2rem;
+}
+.tp-hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2.4rem;
+    margin: 0;
+    background: linear-gradient(90deg, #ff2e93, #7c4dff, #00e5ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+.tp-hero p {
+    color: #c9c3e6;
+    margin-top: 0.3rem;
+    font-size: 0.98rem;
+}
+
+/* Glass cards */
+.tp-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 18px;
+    padding: 1.1rem 1.3rem;
+    backdrop-filter: blur(6px);
+    margin-bottom: 1rem;
+}
+
+/* Badges */
+.tp-badge {
+    display: inline-block;
+    padding: 0.35rem 1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+}
+.badge-Dry { background: rgba(0, 230, 130, 0.18); color: #29ffab; border: 1px solid #29ffab55; }
+.badge-Damp { background: rgba(255, 214, 0, 0.18); color: #ffe066; border: 1px solid #ffe06655; }
+.badge-Wet { background: rgba(0, 179, 255, 0.18); color: #4fd3ff; border: 1px solid #4fd3ff55; }
+.badge-Drying { background: rgba(124, 77, 255, 0.2); color: #b39dff; border: 1px solid #b39dff55; }
+
+.tp-suggestion {
+    border-radius: 16px;
+    padding: 1rem 1.2rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    background: linear-gradient(120deg, rgba(124,77,255,0.18), rgba(0,229,255,0.10));
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Metric numbers */
+.tp-metric-label { color: #9d97c2; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.tp-metric-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700; color: #fff; }
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #120a26 0%, #0a0714 100%);
+    border-right: 1px solid rgba(255,255,255,0.06);
+}
+
+/* Buttons */
+.stButton>button, .stDownloadButton>button {
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(90deg, #ff2e93, #7c4dff);
+    color: white;
+    font-weight: 700;
+    padding: 0.5rem 1.4rem;
+    transition: transform 0.15s ease;
+}
+.stButton>button:hover, .stDownloadButton>button:hover {
+    transform: scale(1.03);
+    color: white;
+}
+
+hr { border-color: rgba(255,255,255,0.08); }
