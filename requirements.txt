@@ -1,6 +1,0 @@
-streamlit==1.38.0
-opencv-python-headless==4.10.0.84
-numpy==1.26.4
-pandas==2.2.2
-plotly==5.24.1
-Pillow==10.4.0
