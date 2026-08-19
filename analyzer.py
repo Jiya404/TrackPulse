@@ -7,13 +7,16 @@ This is a hybrid computer-vision + rule-based classifier (not a pretrained
 "call one API" solution, and not a from-scratch deep net either — a balanced
 middle ground that's perfect for a hackathon timeline):
 
-1. Extract handcrafted visual features from each frame using OpenCV:
+1. Extract handcrafted visual features from each frame using Pillow + numpy
+   only (deliberately avoids OpenCV — cloud Python versions often roll out
+   before opencv ships a matching wheel, which breaks deploys):
    - brightness (mean V channel)
    - saturation (mean S channel)
    - specular highlight ratio (bright, low-saturation pixels -> glare from
      a wet/reflective surface)
-   - edge density (Canny edges -> dry tarmac is "textured/grainy", wet
-     tarmac looks smoother/blurrier because reflections wash out texture)
+   - edge density (gradient-magnitude edge map -> dry tarmac is
+     "textured/grainy", wet tarmac looks smoother/blurrier because
+     reflections wash out texture)
 
 2. Combine these into a single 0-100 "wetness score" using weighted rules.
 
@@ -24,8 +27,8 @@ middle ground that's perfect for a hackathon timeline):
    the tire-change suggestion engine.
 """
 
-import cv2
 import numpy as np
+from PIL import Image
 
 
 class TrackConditionAnalyzer:
@@ -39,21 +42,25 @@ class TrackConditionAnalyzer:
         self.history_window = history_window
 
     # ---------- 1. feature extraction ----------
-    def extract_features(self, img_bgr: np.ndarray) -> dict:
-        img = cv2.resize(img_bgr, (320, 240))
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv)
+    def extract_features(self, pil_img: Image.Image) -> dict:
+        img = pil_img.convert("RGB").resize((320, 240))
 
-        brightness = float(np.mean(v))
-        saturation = float(np.mean(s))
+        # HSV gives us brightness (V) and saturation (S) directly
+        hsv = np.array(img.convert("HSV"))
+        h_ch, s_ch, v_ch = hsv[:, :, 0], hsv[:, :, 1], hsv[:, :, 2]
+
+        brightness = float(np.mean(v_ch))
+        saturation = float(np.mean(s_ch))
 
         # glare / specular highlight: very bright + washed-out (low sat) pixels
-        highlight_mask = (v > 235) & (s < 40)
+        highlight_mask = (v_ch > 235) & (s_ch < 40)
         specular_ratio = float(np.sum(highlight_mask)) / highlight_mask.size
 
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        edges = cv2.Canny(gray, 50, 150)
-        edge_density = float(np.sum(edges > 0)) / edges.size
+        # edge density via a simple Sobel-style gradient magnitude (no OpenCV needed)
+        gray = np.array(img.convert("L"), dtype=np.float32)
+        gx, gy = np.gradient(gray)
+        grad_mag = np.sqrt(gx ** 2 + gy ** 2)
+        edge_density = float(np.mean(grad_mag > 8))
 
         return {
             "brightness": brightness,
@@ -65,7 +72,7 @@ class TrackConditionAnalyzer:
     # ---------- 2. wetness score ----------
     def compute_wetness_score(self, feats: dict) -> float:
         specular_norm = min(feats["specular_ratio"] * 8, 1.0)
-        edge_norm = min(feats["edge_density"] * 4, 1.0)
+        edge_norm = min(feats["edge_density"] * 6, 1.0)
         darkness_norm = 1 - min(feats["brightness"] / 255, 1.0)
 
         score = (
@@ -85,8 +92,8 @@ class TrackConditionAnalyzer:
             return "Wet"
 
     # ---------- 4. full classification w/ trend awareness ----------
-    def classify(self, img_bgr: np.ndarray, history: list | None = None) -> dict:
-        feats = self.extract_features(img_bgr)
+    def classify(self, pil_img: Image.Image, history: list | None = None) -> dict:
+        feats = self.extract_features(pil_img)
         score = self.compute_wetness_score(feats)
         label = self.base_label(score)
         trend = "steady"

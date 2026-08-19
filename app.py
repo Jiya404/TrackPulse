@@ -8,7 +8,6 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-import cv2
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
@@ -133,8 +132,7 @@ with left:
 
 # process any new images through the analyzer, in upload order
 for fname, pil_img in new_images:
-    bgr = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
-    result = analyzer.classify(bgr, history=st.session_state.history)
+    result = analyzer.classify(pil_img, history=st.session_state.history)
     st.session_state.history.append(
         {
             "filename": fname,
